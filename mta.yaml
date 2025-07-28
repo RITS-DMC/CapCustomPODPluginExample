@@ -1,0 +1,65 @@
+ID: democapplugin
+_schema-version: '3.2'
+version: 0.0.1
+
+modules:
+  - name: democapplugin
+    type: html5
+    path: app/democapplugin
+    parameters:
+      disk-quota: 512M
+      memory: 256M
+    properties:
+      httpHeaders:
+        - X-Frame-Options: deny
+      CORS: "[{\"uriPattern\": \"^/democapplugin/(.*)$\",\"allowedOrigin\": [
+               {\"host\": \"ritsdmc-az12fc9w.execution.eu20-quality.web.dmc.cloud.sap\",\"protocol\": \"https\"}],
+               \"allowedMethods\": [\"GET\",\"OPTIONS\"],
+               \"allowedHeaders\":[\"Origin\", \"Accept\",\"X-Requested-With\",\"Content-Type\",
+               \"Access-Control-Request-Method\",\"Access-Control-Request-Headers\",\"Authorization\",
+               \"X-Sap-Cid\",\"X-Csrf-Token\",\"x-dme-industry-type\",\"x-dme-plant\",\"x-features\"],
+               \"exposeHeaders\": [\"Accept\",\"Authorization\",\"X-Requested-With\",\"X-Sap-Cid\",
+               \"Access-Control-Allow-Origin\",\"Access-Control-Allow-Credentials\",\"X-Csrf-Token\",
+               \"Content-Type\",\"x-dme-industry-type\",\"x-dme-plant\",\"x-features\"]}]"
+    requires:
+      - name: dm-cap-custom-plugins-auth
+      - name: dm-cap-custom-plugins-destination
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api
+          url: ~{srv-url}
+          forwardAuthToken: true
+
+  - name: dm-cap-custom-plugins-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      disk-quota: 1024M
+      memory: 512M
+      buildpack: nodejs_buildpack
+      readiness-health-check-type: http
+      readiness-health-check-http-endpoint: /health
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: dm-cap-custom-plugins-auth
+
+resources:
+  - name: dm-cap-custom-plugins-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: dm-cap-custom-plugins-auth
+        tenant-mode: dedicated
+
+  - name: dm-cap-custom-plugins-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite

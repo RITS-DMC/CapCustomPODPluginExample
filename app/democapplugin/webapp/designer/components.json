@@ -1,0 +1,15 @@
+{
+	"components": [
+		{
+			"id": "democapplugin",
+			"type": "VIEW_PLUGIN",
+			"allowMultipleInstances": false,
+			"name": "rits.cap.custom.plugin.democapplugin.democapplugin",
+			"propertyEditor": "rits.cap.custom.plugin.democapplugin.democapplugin.builder.PropertyEditor",
+			"i18n": "rits.cap.custom.plugin.democapplugin.democapplugin.i18n.i18n",
+            "productionProcessEnabled": true,
+           "productionProcessTitle": "democapplugin",
+			"supportedPodTypes": ["WORK_CENTER","OPERATION","ORDER","OTHER"]
+		}   
+	]
+}
